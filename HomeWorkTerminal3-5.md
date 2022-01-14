@@ -1,112 +1,258 @@
-<h1>Домашнее задание к занятию "3.6. Компьютерные сети, лекция 1"</h1>
+<h1>Домашнее задание к занятию "3.5. Файловые системы"</h1>
 
-1. Работа c HTTP через телнет.
+1. Узнайте о sparse (разряженных) файлах.
+        
+        Почитал, напоминает динамические диски в виртуальных машинах. Возможно там так и реализовано. 
 
-    Подключитесь утилитой телнет к сайту stackoverflow.com telnet stackoverflow.com 80
-    отправьте HTTP запрос
+2.Могут ли файлы, являющиеся жесткой ссылкой на один объект, иметь разные права доступа и владельца? Почему?
 
-         GET /questions HTTP/1.0
-         HOST: stackoverflow.com
-         [press enter]
-         [press enter]
+    Нет, потому что хардлинки это ссылки на один и тот же объект и они имеют одинаковые права. 
 
-    В ответе укажите полученный HTTP код, что он означает?
-
-      vagrant@vagrant:~$ telnet stackoverflow.com 80
-
-   HTTP/1.1 301 Moved Permanently
-   cache-control: no-cache, no-store, must-revalidate
-   location: https://stackoverflow.com/questions
-   x-request-guid: b9b8ada8-b9ee-49a8-9272-6b502ad0386d
-   feature-policy: microphone 'none'; speaker 'none'
-   content-security-policy: upgrade-insecure-requests; frame-ancestors 'self' https://stackexchange.com
-   Accept-Ranges: bytes
-   Date: Fri, 14 Jan 2022 11:03:41 GMT
-   Via: 1.1 varnish
-   Connection: close
-   X-Served-By: cache-fra19155-FRA
-   X-Cache: MISS
-   X-Cache-Hits: 0
-   X-Timer: S1642158222.838390,VS0,VE92
-   Vary: Fastly-SSL
-   X-DNS-Prefetch-Control: off
-   Set-Cookie: prov=ccac173a-2b1d-73b7-0e58-ae3ed38f6141; domain=.stackoverflow.com; expires=Fri, 01-Jan-2055 00:00:00 GMT; path=/; HttpOnly
-   
-   301 код ответа, это редирект на https://stackoverflow.com/questions
-
-2. Повторите задание 1 в браузере, используя консоль разработчика F12.
-
-    откройте вкладку Network
-    отправьте запрос http://stackoverflow.com
-    найдите первый ответ HTTP сервера, откройте вкладку Headers
-    укажите в ответе полученный HTTP код.
-
-         307 Documement /Redirect
-
-    проверьте время загрузки страницы, какой запрос обрабатывался дольше всего?
-
-         345ms document https://stackoverflow.com
-
-    приложите скриншот консоли браузера в ответ.
-
-      
-
-3. Какой IP адрес у вас в интернете?
-
-      178.70.131.13      
-
-4. Какому провайдеру принадлежит ваш IP адрес? Какой автономной системе AS? Воспользуйтесь утилитой whois
-
-      Ростелеком, AS12389б 
-
-5. Через какие сети проходит пакет, отправленный с вашего компьютера на адрес 8.8.8.8? Через какие AS? Воспользуйтесь утилитой traceroute
-
-           vagrant@vagrant:~$  traceroute -AIn 8.8.8.8
-   
-      traceroute to 8.8.8.8 (8.8.8.8), 30 hops max, 60 byte packets
-       1  10.0.2.2 [*]  0.248 ms  0.184 ms  0.159 ms
-       2  192.168.213.1 [*]  1.363 ms  1.644 ms  1.617 ms
-       3  95.55.24.1 [AS12389]  3.775 ms  4.652 ms  5.548 ms
-       4  212.48.204.164 [AS12389]  5.517 ms  5.648 ms  5.623 ms
-       5  188.254.2.6 [AS12389]  9.014 ms  9.115 ms  9.349 ms
-       6  87.226.194.47 [AS12389]  8.407 ms  6.922 ms  7.095 ms
-       7  74.125.244.181 [AS15169]  7.522 ms  7.215 ms  8.497 ms
-       8  72.14.232.84 [AS15169]  8.466 ms  8.689 ms  8.917 ms
-       9  142.251.61.219 [AS15169]  11.921 ms  11.956 ms  12.327 ms
-      10  172.253.79.113 [AS15169]  11.328 ms  11.575 ms  11.534 ms
-      11  * * *
-      12  * * *
-      13  * * *
-      14  * * *
-      15  * * *
-      16  * * *
-      17  * * *
-      18  * * *
-      19  * * *
-      20  8.8.8.8 [AS15169]  14.923 ms  14.920 ms  15.066 ms
+3. Сделайте vagrant destroy на имеющийся инстанс Ubuntu. Замените содержимое Vagrantfile следующим:
 
 
-6. Повторите задание 5 в утилите mtr. На каком участке наибольшая задержка - delay?
+       Vagrant.configure("2") do |config|
+         config.vm.box = "bento/ubuntu-20.04"
+         config.vm.provider :virtualbox do |vb|
+           lvm_experiments_disk0_path = "/tmp/lvm_experiments_disk0.vmdk"
+           lvm_experiments_disk1_path = "/tmp/lvm_experiments_disk1.vmdk"
+           vb.customize ['createmedium', '--filename', lvm_experiments_disk0_path, '--size', 2560]
+           vb.customize ['createmedium', '--filename', lvm_experiments_disk1_path, '--size', 2560]
+           vb.customize ['storageattach', :id, '--storagectl', 'SATA Controller', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', lvm_experiments_disk0_path]
+           vb.customize ['storageattach', :id, '--storagectl', 'SATA Controller', '--port', 2, '--device', 0, '--type', 'hdd', '--medium', lvm_experiments_disk1_path]
+         end
+       end
+    
+       Данная конфигурация создаст новую виртуальную машину с двумя дополнительными неразмеченными дисками по 2.5 Гб.
+    
+    vagrant@vagrant:~$ lsblk
+    NAME                 MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+    sda                    8:0    0   64G  0 disk
+    ├─sda1                 8:1    0  512M  0 part /boot/efi
+    ├─sda2                 8:2    0    1K  0 part
+    └─sda5                 8:5    0 63.5G  0 part
+      ├─vgvagrant-root   253:0    0 62.6G  0 lvm  /
+      └─vgvagrant-swap_1 253:1    0  980M  0 lvm  [SWAP]
+    sdb                    8:16   0  2.5G  0 disk
+    sdc                    8:32   0  2.5G  0 disk
+    
 
-     AS15169  72.14.232.84                                                     0.0%    89    8.0   9.5   7.8  25.1   2.9
+4. Используя fdisk, разбейте первый диск на 2 раздела: 2 Гб, оставшееся пространство.
 
-7. Какие DNS сервера отвечают за доменное имя dns.google? Какие A записи? воспользуйтесь утилитой dig
 
-         Addresses:  2001:4860:4860::8844
-                 2001:4860:4860::8888
-                 8.8.8.8
-                 8.8.4.4
+    _vagrant@vagrant:~$ lsblk
+    NAME                 MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+    sda                    8:0    0   64G  0 disk
+    ├─sda1                 8:1    0  512M  0 part /boot/efi
+    ├─sda2                 8:2    0    1K  0 part
+    └─sda5                 8:5    0 63.5G  0 part
+      ├─vgvagrant-root   253:0    0 62.6G  0 lvm  /
+      └─vgvagrant-swap_1 253:1    0  980M  0 lvm  [SWAP]
+    sdb                    8:16   0  2.5G  0 disk
+    ├─sdb1                 8:17   0    2G  0 part
+    └─sdb2                 8:18   0  500M  0 part_
 
-             vagrant@vagrant:~$ dig +short NS dns.google
-                  ns1.zdns.google.
-                  ns3.zdns.google.
-                  ns4.zdns.google.
-                  ns2.zdns.google.
+5. Используя sfdisk, перенесите данную таблицу разделов на второй диск.
 
-8. Проверьте PTR записи для IP адресов из задания 7. Какое доменное имя привязано к IP? воспользуйтесь утилитой dig
+    
+       vagrant@vagrant:~$ sudo sfdisk -d /dev/sdb | sudo sfdisk --force /dev/sdc
 
-      vagrant@vagrant:~$ dig -x 8.8.8.8 | grep arpa
-      8.8.8.8.in-addr.arpa.   7175    IN      PTR     dns.google.
-      vagrant@vagrant:~$ dig -x 8.8.4.4 | grep arpa
-      4.4.8.8.in-addr.arpa.   14400   IN      PTR     dns.google.
+       _vagrant@vagrant:~$ lsblk
+         NAME                 MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+         sda                    8:0    0   64G  0 disk
+         ├─sda1                 8:1    0  512M  0 part /boot/efi
+         ├─sda2                 8:2    0    1K  0 part
+         └─sda5                 8:5    0 63.5G  0 part
+           ├─vgvagrant-root   253:0    0 62.6G  0 lvm  /
+           └─vgvagrant-swap_1 253:1    0  980M  0 lvm  [SWAP]
+         sdb                    8:16   0  2.5G  0 disk
+         ├─sdb1                 8:17   0    2G  0 part
+         └─sdb2                 8:18   0  500M  0 part
+         sdc                    8:32   0  2.5G  0 disk
+         ├─sdc1                 8:33   0    2G  0 part
+         └─sdc2                 8:34   0  500M  0 part_
 
+
+6. Соберите mdadm RAID1 на паре разделов 2 Гб.
+
+        sudo mdadm --create /dev/md0 --level=1 --raid-devices=2 /dev/sdb1 /dev/sdc1
+
+7. Соберите mdadm RAID0 на второй паре маленьких разделов.
+
+
+        sudo mdadm --create /dev/md0 --level=1 --raid-devices=2 /dev/sdb1 /dev/sdc1
+
+8. Создайте 2 независимых PV на получившихся md-устройствах.
+
+
+    vagrant@vagrant:~$ sudo pvcreate /dev/md1 /dev/md0
+    Physical volume "/dev/md1" successfully created.
+    Physical volume "/dev/md0" successfully created.
+
+9. Создайте общую volume-group на этих двух PV.
+
+
+       vgcreate vg1 /dev/md1 /dev/md0
+
+10. Создайте LV размером 100 Мб, указав его расположение на PV с RAID0.
+
+
+           vagrant@vagrant:~$ sudo lvcreate -L 100M vg1 /dev/md0
+           Logical volume "lvol0" created.
+
+11. Создайте mkfs.ext4 ФС на получившемся LV.
+
+
+          Vagrant@vagrant:~$ sudo mkfs.ext4 /dev/vg1/lvol0
+          mke2fs 1.45.5 (07-Jan-2020)
+          Creating filesystem with 25600 4k blocks and 25600 inodes
+
+          Allocating group tables: done
+          Writing inode tables: done
+          Creating journal (1024 blocks): done
+          Writing superblocks and filesystem accounting information: done
+
+12. Смонтируйте этот раздел в любую директорию, например, /tmp/new.
+
+
+    vagrant@vagrant:~$ mkdir /tmp/new
+    vagrant@vagrant:~$ sudo mount /dev/vg1/lvol0 /tmp/new
+
+13. Поместите туда тестовый файл, например wget https://mirror.yandex.ru/ubuntu/ls-lR.gz -O /tmp/new/test.gz.
+
+
+       vagrant@vagrant:~$ sudo wget https://mirror.yandex.ru/ubuntu/ls-lR.gz -O /tmp/new/test.gz    
+    
+14. Прикрепите вывод lsblk.
+
+
+      _vagrant@vagrant:~$ lsblk
+           NAME                 MAJ:MIN RM  SIZE RO TYPE  MOUNTPOINT
+           sda                    8:0    0   64G  0 disk
+
+           ├─sda1                 8:1    0  512M  0 part  /boot/efi
+
+           ├─sda2                 8:2    0    1K  0 part
+
+           └─sda5                 8:5    0 63.5G  0 part
+
+           ├─vgvagrant-root   253:0    0 62.6G  0 lvm   /
+
+           └─vgvagrant-swap_1 253:1    0  980M  0 lvm   [SWAP]
+
+           sdb                    8:16   0  2.5G  0 disk
+
+           ├─sdb1                 8:17   0    2G  0 part
+
+           │ └─md0                9:0    0    2G  0 raid1
+
+           │   └─vg1-lvol0      253:2    0  100M  0 lvm   /tmp/new
+
+           └─sdb2                 8:18   0  500M  0 part
+
+              └─md1                9:1    0  996M  0 raid0
+
+           sdc                    8:32   0  2.5G  0 disk
+
+           ├─sdc1                 8:33   0    2G  0 part
+
+           │ └─md0                9:0    0    2G  0 raid1
+
+           │   └─vg1-lvol0      253:2    0  100M  0 lvm   /tmp/new
+
+           └─sdc2                 8:34   0  500M  0 part
+
+              └─md1                9:1    0  996M  0 raid0_   
+
+
+15. Протестируйте целостность файла:
+
+
+    root@vagrant:~# gzip -t /tmp/new/test.gz
+    root@vagrant:~# echo $?
+    0
+16. Используя pvmove, переместите содержимое PV с RAID0 на RAID1.
+
+
+           vagrant@vagrant:~$ sudo pvmove /dev/md0
+             /dev/md0: Moved: 24.00%
+             /dev/md0: Moved: 100.00%_
+           
+            vagrant@vagrant:~$ lsblk
+             NAME                 MAJ:MIN RM  SIZE RO TYPE  MOUNTPOINT
+
+             sda                    8:0    0   64G  0 disk
+
+             ├─sda1                 8:1    0  512M  0 part  /boot/efi
+
+             ├─sda2                 8:2    0    1K  0 part
+
+             └─sda5                 8:5    0 63.5G  0 part
+
+               ├─vgvagrant-root   253:0    0 62.6G  0 lvm   /
+
+               └─vgvagrant-swap_1 253:1    0  980M  0 lvm   [SWAP]
+
+             sdb                    8:16   0  2.5G  0 disk
+
+             ├─sdb1                 8:17   0    2G  0 part
+
+             │ └─md0                9:0    0    2G  0 raid1
+
+             └─sdb2                 8:18   0  500M  0 part
+
+               └─md1                9:1    0  996M  0 raid0
+
+                └─vg1-lvol0      253:2    0  100M  0 lvm   /tmp/new
+
+             sdc                    8:32   0  2.5G  0 disk
+
+             ├─sdc1                 8:33   0    2G  0 part
+
+             │ └─md0                9:0    0    2G  0 raid1
+
+             └─sdc2                 8:34   0  500M  0 part
+
+               └─md1                9:1    0  996M  0 raid0
+
+                └─vg1-lvol0      253:2    0  100M  0 lvm   /tmp/new
+
+
+17. Сделайте --fail на устройство в вашем RAID1 md.
+
+
+       vagrant@vagrant:~$ sudo mdadm /dev/md127 --fail /dev/sdc1(после перезагрузки поменялось имя райда)
+       mdadm: set /dev/sdc1 faulty in /dev/md127 
+ 
+ 
+
+       vagrant@vagrant:~$ sudo mdadm -D /dev/md127 
+        ...
+        Number   Major   Minor   RaidDevice State
+       0       8       17        0      active sync   /dev/sdb1
+       -       0        0        1      removed
+
+       1       8       33        -      faulty   /dev/sdc1
+
+18. Подтвердите выводом dmesg, что RAID1 работает в деградированном состоянии.
+
+
+        vagrant@vagrant:~$ dmesg |grep md127
+        [    2.387643] md/raid1:md127: active with 2 out of 2 mirrors
+        [    2.387661] md127: detected capacity change from 0 to 2144337920
+        [ 1272.879850] md/raid1:md127: Disk failure on sdc1, disabling device.
+               md/raid1:md127: Operation continuing on 1 devices.
+
+19. Протестируйте целостность файла, несмотря на "сбойный" диск он должен продолжать быть доступен:
+
+
+    root@vagrant:~# gzip -t /tmp/new/test.gz
+    root@vagrant:~# echo $?
+    0
+
+        vagrant@vagrant:~$ gzip -t /tmp/new/test.gz
+        vagrant@vagrant:~$ echo $?
+        0
+
+20. Погасите тестовый хост, vagrant destroy.
+    
