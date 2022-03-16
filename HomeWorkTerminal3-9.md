@@ -1,17 +1,17 @@
 Домашнее задание к занятию "3.9. Элементы безопасности информационных систем"
 
     1. Установите Bitwarden плагин для браузера. Зарегестрируйтесь и сохраните несколько паролей.
-![](C:\Users\user\PycharmProjects\devops-netology\bitwarden.png)
+![bitwarden](https://github.com/ferrumfe26/devops-netology/tree/main/bitwarden.png)
 
 
     2. Установите Google authenticator на мобильный телефон. Настройте вход в Bitwarden акаунт через Google authenticator OTP.
 
-![](C:\Users\user\PycharmProjects\devops-netology\2Auth.png)
+![2Auth](https://github.com/ferrumfe26/devops-netology/tree/main/2Auth.png)
 
 
     3. Установите apache2, сгенерируйте самоподписанный сертификат, настройте тестовый сайт для работы по HTTPS.
 
-![](C:\Users\user\PycharmProjects\devops-netology\cert.png)
+![cert](https://github.com/ferrumfe26/devops-netology/tree/main/cert.png)
 
     4. Проверьте на TLS уязвимости произвольный сайт в интернете (кроме сайтов МВД, ФСБ, МинОбр, НацБанк, РосКосмос, РосАтом, РосНАНО и любых госкомпаний, объектов КИИ, ВПК ... и тому подобное).
 
@@ -82,4 +82,4 @@ tcpdump: listening on eth0, link-type EN10MB (Ethernet), capture size 262144 byt
 
 0 packets dropped by kernel
 
-![](C:\Users\user\PycharmProjects\devops-netology\tcpdump.png)
+![tcpdump](https://github.com/ferrumfe26/devops-netology/tree/main/tcpdump.png)
